@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaGear, FaArrowLeft, FaPlus, FaTrash, FaCheck, FaPenToSquare } from "react-icons/fa6";
+import { toast } from "react-toastify";
 import useBillerStore from "../../../stores/useBillerStore";
 import PaginatorFilter from "../../../components/PaginatorFilter";
 
@@ -27,7 +28,8 @@ const AdminBillers = () => {
   const handleCreateBiller = async (e) => {
     e.preventDefault();
     if (!newBillerData.code || !newBillerData.name) {
-      return alert("Vui lòng nhập Mã và Tên Nhà Cung Cấp!");
+      toast.warning("Vui lòng nhập Mã và Tên Nhà Cung Cấp!");
+      return;
     }
 
     const cleanCode = newBillerData.code.trim().toUpperCase();
@@ -38,16 +40,17 @@ const AdminBillers = () => {
     const res = await createBiller(cleanCode, newBillerData.name.trim(), finalInquiryUrl, finalPaymentUrl);
 
     if (res.success) {
+      toast.success("Tạo đối tác Biller thành công!");
       setNewBillerData({ code: "", name: "", inquiryUrl: "", paymentUrl: "" });
       setShowAddBillerForm(false);
       listBillers(page, limit);
     } else {
-      alert(`Lỗi: ${res.message}`);
+      toast.error(`Lỗi: ${res.message}`);
     }
   };
 
   const handleDeleteBiller = (billerId, billerCode) => {
-    alert(`Tính năng xóa đối tác [ ${billerCode} ] bị từ chối!\nBackend Core không hỗ trợ Hard-Delete để bảo toàn lịch sử giao dịch.`);
+    toast.warning(`Tính năng xóa đối tác [ ${billerCode} ] bị từ chối!\nBackend Core không hỗ trợ Hard-Delete để bảo toàn lịch sử giao dịch.`);
   };
 
   const handleSaveDetails = async () => {
@@ -59,10 +62,11 @@ const AdminBillers = () => {
       status: currentBiller.status
     });
     if (res.success) {
+      toast.success("Cập nhật Biller thành công!");
       setIsEditing(false);
       listBillers(page, limit);
     } else {
-      alert(`Cập nhật thất bại: ${res.message}`);
+      toast.error(`Cập nhật thất bại: ${res.message}`);
     }
   };
 

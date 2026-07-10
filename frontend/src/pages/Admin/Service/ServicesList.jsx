@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaGear, FaTrash, FaPlus } from "react-icons/fa6";
+import { toast } from "react-toastify";
 import useServiceStore from "../../../stores/useServiceStore";
 import PaginatorFilter from "../../../components/PaginatorFilter";
 
@@ -18,10 +19,10 @@ const AdminServicesList = () => {
     if (!window.confirm(`Xóa dịch vụ [${serviceCode}] và toàn bộ cấu hình?`)) return;
     const result = await deleteFullServiceConfig(serviceId);
     if (result.success) {
-      alert("Đã xóa service");
+      toast.success("Đã xóa service");
       listServices(page, limit);
     } else {
-      alert("Lỗi xóa: " + (result.message || ""));
+      toast.error("Lỗi xóa: " + (result.message || ""));
     }
   };
 

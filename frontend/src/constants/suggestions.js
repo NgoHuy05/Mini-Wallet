@@ -28,7 +28,6 @@ export const LEVEL_SUGGESTIONS = ['productLevel', 'pocket'];
 
 export const TARGET_SUGGESTIONS = [
   'SENDERID', 'RECEIVERID', 'BILLER_POCKET_ID', 'SYSTEM_POCKET_ID',
-  'poc-fee', 'poc-bank',
 ];
 
 export const AMOUNT_SUGGESTIONS = ['AMOUNT', 'DEBITFEE'];

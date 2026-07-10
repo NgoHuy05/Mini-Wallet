@@ -1,5 +1,5 @@
-// src/pages/admin/AdminCashIn.jsx
 import { useState } from "react";
+import { toast } from "react-toastify";
 import {
   FaMoneyBillTransfer,
   FaCircleCheck,
@@ -42,14 +42,17 @@ const AdminCashIn = () => {
 
     if (!receiverPhone.trim()) {
       setLocalError("Vui lòng nhập số điện thoại người nhận.");
+      toast.warning("Vui lòng nhập số điện thoại người nhận.");
       return;
     }
     if (!/^0\d{9}$/.test(receiverPhone.trim())) {
       setLocalError("Số điện thoại không hợp lệ. Định dạng: 0xxxxxxxxx (10 số).");
+      toast.warning("Số điện thoại không hợp lệ.");
       return;
     }
     if (!amount || amount < 1000) {
       setLocalError("Số tiền tối thiểu là 1.000 VND.");
+      toast.warning("Số tiền tối thiểu là 1.000 VND.");
       return;
     }
 
@@ -61,6 +64,7 @@ const AdminCashIn = () => {
 
     if (!requestResult.success) {
       setLocalError(requestResult.message);
+      toast.error(requestResult.message || "Lỗi tạo giao dịch.");
       return;
     }
 
@@ -73,6 +77,7 @@ const AdminCashIn = () => {
         receiverPhone: receiverPhone.trim(),
         time: new Date(),
       });
+      toast.success("Nạp tiền thành công!");
       setReceiverPhone("");
       setAmountDisplay("");
       setMessage("");
@@ -95,7 +100,6 @@ const AdminCashIn = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        {/* Form */}
         <div className="lg:col-span-3">
           <form
             onSubmit={handleSubmit}
@@ -250,7 +254,7 @@ const Row = ({ label, value, mono, strong }) => (
       className={[
         mono ? "font-mono" : "font-sans",
         strong ? "text-base font-bold text-slate-800" : "text-slate-700",
-        "truncate text-right",
+        "break-all text-right",
       ].join(" ")}
     >
       {value}

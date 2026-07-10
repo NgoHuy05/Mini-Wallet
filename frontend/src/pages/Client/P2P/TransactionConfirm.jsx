@@ -1,5 +1,5 @@
-// pages/Client/TransactionConfirm.jsx
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import useTransactionStore from '../../../stores/useTransactionStore';
 import { FaArrowLeft, FaCheck, FaXmark } from 'react-icons/fa6';
 
@@ -15,13 +15,13 @@ const TransactionConfirm = () => {
         if (verifyResult.success) {
           navigate('/transaction/result');
         } else {
-          alert(verifyResult.message || 'Lỗi xác thực');
+          toast.error(verifyResult.message || 'Lỗi xác thực');
         }
       } else {
         navigate('/transaction/verify');
       }
     } else {
-      alert(result.message || 'Lỗi xác nhận');
+      toast.error(result.message || 'Lỗi xác nhận');
     }
   };
 

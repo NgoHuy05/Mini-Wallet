@@ -1,6 +1,6 @@
-// pages/Client/TransactionRequest.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import useServiceStore from '../../../stores/useServiceStore';
 import useTransactionStore from '../../../stores/useTransactionStore';
 import { FaArrowLeft, FaSpinner, FaPhone, FaFileInvoiceDollar, FaCircleCheck } from 'react-icons/fa6';
@@ -18,23 +18,21 @@ const TransactionRequest = () => {
   const { billers, loading: billerLoading, listBillers } = useBillerStore();
   const [selectedBiller, setSelectedBiller] = useState(null);
 
-  // Fetch service
   useEffect(() => {
     const fetchService = async () => {
       try {
         const result = await useServiceStore.getState().getServiceDetail(serviceId);
         if (result.success) {
           setService(result.service);
-          // Nếu là billpayment, fetch danh sách biller
           if (result.service.type === 'billpayment') {
             await listBillers(1, 100);
           }
         } else {
-          alert('Không tìm thấy dịch vụ');
+          toast.error('Không tìm thấy dịch vụ');
           navigate('/');
         }
       } catch {
-        alert('Lỗi tải dịch vụ');
+        toast.error('Lỗi tải dịch vụ');
         navigate('/');
       } finally {
         setLoading(false);
@@ -59,7 +57,6 @@ const TransactionRequest = () => {
     setSubmitting(true);
     setFieldError(null);
 
-    // Validate
     if (service.type === 'p2p') {
       if (!formData.receiverPhone || !/^0\d{9}$/.test(formData.receiverPhone)) {
         setFieldError('Số điện thoại không hợp lệ (10 số, bắt đầu 0)');
