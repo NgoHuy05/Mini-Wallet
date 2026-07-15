@@ -37,31 +37,41 @@ const AdminServiceDetail = () => {
   const [loadingDetail, setLoadingDetail] = useState(!isCreating && !!serviceId);
   const loadedIdRef = useRef(null);
 
+  // Maps a { service, fields, validations, definition, fieldBuilder } shaped
+  // result (from the API, or from an imported JSON file) onto local state.
+  const applyLoadedConfig = useCallback((result, { preserveId } = {}) => {
+    const service = result.service || {};
+    setFormData((prev) => ({
+      ...(preserveId && prev?.id
+        ? { id: prev.id }
+        : service.id
+        ? { id: service.id }
+        : {}),
+      code: service.code || "",
+      name: service.name || "",
+      type: service.type || "billpayment",
+      auth: service.auth || "NONE",
+      action: service.action || "none",
+      actionParams: JSON.stringify(service.actionParams || {}),
+      feeType: service.fee?.type || "fixed",
+      feeValue: service.fee?.value || 0,
+      feeMax: service.fee?.max || 0,
+    }));
+    setTempSchema({
+      fields: result.fields || [],
+      validations: result.validations || [],
+      definition: result.definition?.glSteps || [],
+      inputBuilding: result.fieldBuilder || service.fieldBuilder || [],
+    });
+  }, []);
+
   const loadServiceDetail = useCallback(
     async (id) => {
       setLoadingDetail(true);
       try {
         const result = await useServiceStore.getState().getFullServiceConfig(id);
         if (result.success) {
-          const { service, fields, validations, definition } = result;
-          setFormData({
-            id: service.id,
-            code: service.code,
-            name: service.name,
-            type: service.type,
-            auth: service.auth,
-            action: service.action,
-            actionParams: JSON.stringify(service.actionParams || {}),
-            feeType: service.fee?.type || "fixed",
-            feeValue: service.fee?.value || 0,
-            feeMax: service.fee?.max || 0,
-          });
-          setTempSchema({
-            fields: fields || [],
-            validations: validations || [],
-            definition: definition?.glSteps || [],
-            inputBuilding: service.fieldBuilder || [],
-          });
+          applyLoadedConfig(result);
           setIsEditing(false);
           setActiveTab("fields");
           loadedIdRef.current = id;
@@ -76,7 +86,7 @@ const AdminServiceDetail = () => {
         setLoadingDetail(false);
       }
     },
-    [navigate]
+    [navigate, applyLoadedConfig]
   );
 
   useEffect(() => {
@@ -144,6 +154,44 @@ const AdminServiceDetail = () => {
     setTempSchema(updatedSchema);
   };
 
+  const handleImportJson = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+
+        // Accept either the "full" shape ({ service, fields, validations,
+        // definition, fieldBuilder }) or the flat shape used when saving
+        // ({ code, name, ..., fields, validations, glSteps, fieldBuilder }).
+        const normalized = json.service
+          ? json
+          : {
+              service: {
+                code: json.code,
+                name: json.name,
+                type: json.type,
+                auth: json.auth,
+                action: json.action,
+                actionParams: json.actionParams,
+                fee: json.fee,
+              },
+              fields: json.fields,
+              validations: json.validations,
+              definition: { glSteps: json.glSteps },
+              fieldBuilder: json.fieldBuilder,
+            };
+
+        applyLoadedConfig(normalized, { preserveId: !isCreating });
+        toast.success("Đã import cấu hình từ file JSON. Kiểm tra lại trước khi lưu.");
+      } catch (err) {
+        toast.error("File JSON không hợp lệ: " + err.message);
+      }
+    };
+    reader.onerror = () => toast.error("Không đọc được file JSON");
+    reader.readAsText(file);
+  };
+
   if (loadingDetail) {
     return <div className="text-center py-10 text-gray-500">Đang tải chi tiết service...</div>;
   }
@@ -161,6 +209,7 @@ const AdminServiceDetail = () => {
       activeTab={activeTab}
       onFormChange={setFormData}
       onSchemaChange={handleSchemaChange}
+      onImportJson={handleImportJson}
       onSave={handleSaveService}
       onCancel={() => navigate("/admin/services")}
       onToggleEdit={() => setIsEditing(!isEditing)}
