@@ -1,4 +1,13 @@
-import { FaArrowLeft, FaCheck, FaPenToSquare, FaLock } from "react-icons/fa6";
+import { useRef } from "react";
+import { toast } from "react-toastify";
+import {
+  FaArrowLeft,
+  FaCheck,
+  FaPenToSquare,
+  FaLock,
+  FaUpload,
+  FaDownload,
+} from "react-icons/fa6";
 import ServiceInfoForm from "./ServiceInfoForm";
 import TransFieldsTab from "./TransFieldsTab";
 import TransValidationsTab from "./TransValidationsTab";
@@ -20,12 +29,14 @@ const ServiceForm = ({
   activeTab,
   onFormChange,
   onSchemaChange,
+  onImportJson,
   onSave,
   onCancel,
   onToggleEdit,
   onTabChange,
 }) => {
   const canEdit = isCreating || isEditing;
+  const fileInputRef = useRef(null);
 
   const handleRowChange = (tabKey, index, fieldKey, value) => {
     const updated = [...tempSchema[tabKey]];
@@ -47,6 +58,62 @@ const ServiceForm = ({
     const updated = tempSchema[tabKey].filter((_, i) => i !== index);
     const reIndexed = updated.map((item, i) => ({ ...item, order: i + 1 }));
     onSchemaChange({ ...tempSchema, [tabKey]: reIndexed });
+  };
+
+  const handleImportButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelected = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith(".json")) {
+        toast.error("Vui lòng chọn file .json");
+      } else {
+        onImportJson?.(file);
+      }
+    }
+    // reset so selecting the same file again still fires onChange
+    e.target.value = "";
+  };
+
+  const handleExportJson = () => {
+    let actionParams = {};
+    try {
+      actionParams = JSON.parse(formData.actionParams);
+    } catch {
+      actionParams = {};
+    }
+
+    const exportData = {
+      code: formData.code,
+      name: formData.name,
+      type: formData.type,
+      auth: formData.auth,
+      action: formData.action,
+      actionParams,
+      fee: {
+        type: formData.feeType,
+        value: Number(formData.feeValue) || 0,
+        ...(formData.feeType === "percent" && { max: Number(formData.feeMax) || 0 }),
+      },
+      fieldBuilder: tempSchema?.inputBuilding || [],
+      fields: tempSchema?.fields || [],
+      validations: tempSchema?.validations || [],
+      glSteps: tempSchema?.definition || [],
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${formData.code || "service"}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -74,6 +141,31 @@ const ServiceForm = ({
           </p>
         </div>
         <div className="flex gap-2">
+          {canEdit && (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleFileSelected}
+                className="hidden"
+              />
+              <button
+                onClick={handleImportButtonClick}
+                title="Import cấu hình từ file JSON thay vì nhập tay"
+                className="bg-slate-600 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded shadow flex items-center gap-1"
+              >
+                <FaUpload size={12} /> Import JSON
+              </button>
+            </>
+          )}
+          <button
+            onClick={handleExportJson}
+            title="Xuất cấu hình hiện tại ra file JSON"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded shadow flex items-center gap-1 border border-slate-200"
+          >
+            <FaDownload size={12} /> Export JSON
+          </button>
           {canEdit && (
             <button
               onClick={onSave}
