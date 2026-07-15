@@ -59,6 +59,7 @@ module.exports = {
           await Transaction.updateOne({ transRefId }).set({ billerRefId, status: 'done' });
           await TrailService.appendLog(transRefId, 'VERIFY', `Payment success, billerRefId=${billerRefId}`);
           await TrailService.updateDone(transRefId);
+          
         } catch (paymentErr) {
           await GlExecutor.reverse(serviceId, transbody, transRefId);
           await Transaction.updateOne({ transRefId }).set({ status: 'reversed' });
@@ -71,6 +72,8 @@ module.exports = {
       }
 
       const transaction = await Transaction.findOne({ transRefId });
+      await sails.services.notificationservice.notifyTransaction(transaction);
+
       return { transaction };
     } catch (err) {
       const currentTrail = await TransactionTrail.findOne({ transRefId });

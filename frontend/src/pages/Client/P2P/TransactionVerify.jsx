@@ -76,7 +76,7 @@ const TransactionVerify = () => {
                 setPin(e.target.value.replace(/\D/g, ''));
                 setError(null);
               }}
-              placeholder="Nhập 6 số PIN"
+              placeholder="Nhập PIN"
               className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-center text-2xl tracking-[0.5em] font-mono transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
               autoFocus
             />

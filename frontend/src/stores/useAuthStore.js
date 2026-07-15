@@ -1,13 +1,14 @@
 import { create } from 'zustand';
-import api from '../api'; // axios instance đã cấu hình baseURL, interceptor...
+import api from '../api';
+import useNotificationStore from './useNotificationStore';
 
 const useAuthStore = create((set) => ({
   token: localStorage.getItem('token') || null,
   userType: localStorage.getItem('userType') || null,
+  userId: localStorage.getItem('userId') || null,
   loading: false,
   error: null,
 
-  // Đăng ký khách hàng
   register: async (phone, pin) => {
     set({ loading: true, error: null });
     try {
@@ -17,7 +18,9 @@ const useAuthStore = create((set) => ({
         const { token, customer } = data.data;
         localStorage.setItem('token', token);
         localStorage.setItem('userType', 'customer');
-        set({ token, userType: 'customer', loading: false });
+        localStorage.setItem('userId', customer.id);
+        set({ token, userType: 'customer', userId: customer.id, loading: false });
+        useNotificationStore.getState().initSocket(customer.id);
         return { success: true, customer };
       } else {
         set({ error: data.message, loading: false });
@@ -29,17 +32,18 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  // Đăng nhập khách hàng
   login: async (phone, pin) => {
     set({ loading: true, error: null });
     try {
       const res = await api.post('/auth/customer/login', { phone, pin });
       const data = res.data;
       if (data.err === 200) {
-        const token = data.data.token;
+        const { token, customer } = data.data;
         localStorage.setItem('token', token);
         localStorage.setItem('userType', 'customer');
-        set({ token, userType: 'customer', loading: false });
+        localStorage.setItem('userId', customer.id);
+        set({ token, userType: 'customer', userId: customer.id, loading: false });
+        useNotificationStore.getState().initSocket(customer.id);
         return { success: true };
       } else {
         set({ error: data.message, loading: false });
@@ -51,17 +55,18 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  // Đăng nhập admin
   loginAdmin: async (username, password) => {
     set({ loading: true, error: null });
     try {
       const res = await api.post('/auth/admin/login', { username, password });
       const data = res.data;
       if (data.err === 200) {
-        const token = data.data.token;
+        const { token, officer } = data.data;
         localStorage.setItem('token', token);
         localStorage.setItem('userType', 'officer');
-        set({ token, userType: 'officer', loading: false });
+        localStorage.setItem('userId', officer.id);
+        set({ token, userType: 'officer', userId: officer.id, loading: false });
+        useNotificationStore.getState().initSocket(officer.id);
         return { success: true };
       } else {
         set({ error: data.message, loading: false });
@@ -73,7 +78,6 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  // Tạo admin mới (chỉ dành cho officer)
   createAdmin: async (username, password, displayName) => {
     set({ loading: true, error: null });
     try {
@@ -92,11 +96,16 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  // Đăng xuất
   logout: () => {
+    const { socket } = useNotificationStore.getState();
+    if (socket) {
+      socket.disconnect();
+    }
+    useNotificationStore.getState().reset();
     localStorage.removeItem('token');
     localStorage.removeItem('userType');
-    set({ token: null, userType: null, error: null });
+    localStorage.removeItem('userId');
+    set({ token: null, userType: null, userId: null, error: null });
   },
 }));
 

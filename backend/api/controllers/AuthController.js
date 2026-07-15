@@ -1,7 +1,7 @@
+// api/controllers/AuthController.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SALT_ROUNDS = 10;
-
 
 module.exports = {
   register: async (req, res) => {
@@ -92,7 +92,15 @@ module.exports = {
         sails.config.custom.ACCESS_TOKEN_SECRET,
         { expiresIn: sails.config.custom.ACCESS_TOKEN_EXPIRES }
       );
-      return res.ok({ token });
+
+      return res.ok({
+        token,
+        customer: {
+          id: customer.id,
+          phone: customer.phone,
+          pocketId: customer.pocketId,
+        },
+      });
     } catch (err) {
       return res.error(sails.config.custom.respCode.INTERNAL_ERROR, err.message);
     }

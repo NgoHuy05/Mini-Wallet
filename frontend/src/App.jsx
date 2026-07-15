@@ -1,25 +1,37 @@
+import { useEffect } from 'react';
 import { RouterProvider } from "react-router-dom";
 import { routers } from "./routers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useAuthStore from './stores/useAuthStore';
+import useNotificationStore from './stores/useNotificationStore';
+
 function App() {
+  const { token, userId } = useAuthStore();
+  const { initSocket } = useNotificationStore();
+
+  useEffect(() => {
+    if (token && userId) {
+      initSocket(userId);
+    }
+  }, [initSocket, token, userId]);
+
   return (
     <>
-      <div>
-        <RouterProvider router={routers} />
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </div>
+      <RouterProvider router={routers} />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        limit={3}
+      />
     </>
   );
 }

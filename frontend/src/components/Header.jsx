@@ -1,7 +1,7 @@
-// components/Header.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/useAuthStore';
 import { FaWallet, FaHistory, FaSignOutAlt, FaHome } from 'react-icons/fa';
+import NotificationDropdown from './NotificationDropdown';
 
 const Header = () => {
   const { token, userType, logout } = useAuthStore();
@@ -24,6 +24,7 @@ const Header = () => {
             <Link to="/history" className="flex items-center gap-1 hover:text-indigo-200 transition-colors">
               <FaHistory /> Lịch sử
             </Link>
+            <NotificationDropdown />
             <button
               onClick={() => { logout(); navigate('/login'); }}
               className="flex items-center gap-1 bg-rose-500 hover:bg-rose-600 px-3 py-1 rounded transition-colors"
