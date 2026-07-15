@@ -48,5 +48,7 @@ module.exports.policies = {
   'PocketEntryController': {
     '*': ['isAuthenticated', 'isOfficer'],
   },
-
+  'NotificationController': {
+    '*': 'isAuthenticated',
+  },
 };

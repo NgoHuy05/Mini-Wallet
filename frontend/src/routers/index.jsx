@@ -33,6 +33,7 @@ import TransactionVerify from "../pages/Client/P2P/TransactionVerify";
 import TransactionResult from "../pages/Client/P2P/TransactionResult";
 import TransactionHistory from "../pages/Client/History/TransactionHistory";
 import TransactionDetail from "../pages/Client/History/TransactionDetail";
+import NotificationPage from "../pages/Client/Notification";
 
 
 export const routers = createBrowserRouter([
@@ -50,6 +51,7 @@ export const routers = createBrowserRouter([
       { path: "transaction/verify", element: <TransactionVerify /> },
       { path: "transaction/result", element: <TransactionResult /> },
 
+      { path: "notifications", element: <NotificationPage /> },
       { path: "pocket", element: <Pocket /> },
       { path: "history", element: <TransactionHistory /> },
       { path: "history/:transactionId", element: <TransactionDetail /> },

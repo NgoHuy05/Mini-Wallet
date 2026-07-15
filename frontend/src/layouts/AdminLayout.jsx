@@ -1,3 +1,4 @@
+// layouts/AdminLayout.jsx
 import { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import {
@@ -9,6 +10,7 @@ import {
   FaMoneyBillTransfer,
 } from "react-icons/fa6";
 import { HiBars3BottomLeft, HiBars3 } from "react-icons/hi2";
+import NotificationDropdown from "../components/NotificationDropdown";
 
 const AdminLayout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -62,7 +64,7 @@ const AdminLayout = () => {
     {
       group: "Giao dịch",
       items: [
-                {
+        {
           path: "transactions",
           label: "Transaction History",
           icon: <FaMagnifyingGlass size={18} />,
@@ -72,7 +74,6 @@ const AdminLayout = () => {
           label: "Transaction Trail",
           icon: <FaMagnifyingGlass size={18} />,
         },
-
       ],
     },
     {
@@ -200,6 +201,8 @@ const AdminLayout = () => {
           </div>
 
           <div className="flex items-center space-x-3">
+            {/* Thêm NotificationDropdown cho admin */}
+            <NotificationDropdown />
             <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-semibold text-gray-700">
               Officer

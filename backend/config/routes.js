@@ -73,4 +73,9 @@ module.exports.routes = {
   'POST /admin/pocket-entries/detail': 'PocketEntryController.detail',
   'POST /admin/pocket-entries/by-trail': 'PocketEntryController.byTrail',    // lấy theo transRefId
   'POST /admin/pocket-entries/by-pocket': 'PocketEntryController.byPocket',  // lấy theo pocketId
+
+  'POST /notifications/list': 'NotificationController.list',
+  'POST /notifications/mark-read': 'NotificationController.markAsRead',
+  'POST /notifications/mark-all-read': 'NotificationController.markAllAsRead',
+  'POST /notifications/count-unread': 'NotificationController.countUnread',
 };
