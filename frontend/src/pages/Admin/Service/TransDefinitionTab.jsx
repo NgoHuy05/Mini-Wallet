@@ -10,13 +10,11 @@ import {
   POCKET_ALIAS_SUGGESTIONS,
 } from "../../../constants/pocketAliases";
 
-// Hàm lấy tên hiển thị (alias) cho target, chỉ áp dụng khi level là 'pocket'
 const getDisplayTarget = (target, level) => {
   if (!target || level !== 'pocket') return target;
   return POCKET_ID_TO_ALIAS[target] || target;
 };
 
-// Hàm chuyển đổi giá trị nhập vào thành ID thực tế (chỉ áp dụng cho level 'pocket')
 const resolveRealId = (inputValue, level) => {
   if (level === 'pocket') {
     return POCKET_ALIAS_TO_ID[inputValue] || inputValue;
@@ -33,8 +31,8 @@ const TransDefinitionTab = ({ definition, canEdit, onRowChange, onAddRow, onDele
             onAddRow("definition", {
               order: (definition?.length || 0),
               amount: "",
-              debit: { level: "", target: "" },
-              credit: { level: "", target: "" },
+              debit: { level: "productLevel", target: "" },
+              credit: { level: "productLevel", target: "" },
             })
           }
           className="bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 shadow-sm"
@@ -61,7 +59,6 @@ const TransDefinitionTab = ({ definition, canEdit, onRowChange, onAddRow, onDele
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            {/* Debit Side */}
             <SideEditor
               side="debit"
               step={step}
@@ -70,7 +67,6 @@ const TransDefinitionTab = ({ definition, canEdit, onRowChange, onAddRow, onDele
               onRowChange={onRowChange}
               definition={definition}
             />
-            {/* Credit Side */}
             <SideEditor
               side="credit"
               step={step}
@@ -80,7 +76,6 @@ const TransDefinitionTab = ({ definition, canEdit, onRowChange, onAddRow, onDele
               definition={definition}
             />
           </div>
-          {/* Amount Field */}
           <div className="grid grid-cols-3 gap-1 text-xs">
             <span className="text-gray-400">Amount Field:</span>
             <input
@@ -101,7 +96,6 @@ const TransDefinitionTab = ({ definition, canEdit, onRowChange, onAddRow, onDele
   </div>
 );
 
-// Component con cho Debit/Credit Side
 const SideEditor = ({ side, step, idx, canEdit, onRowChange, definition }) => {
   const currentLevel = step[side]?.level || 'productLevel';
   const currentTarget = step[side]?.target || '';
@@ -127,12 +121,10 @@ const SideEditor = ({ side, step, idx, canEdit, onRowChange, definition }) => {
     onRowChange("definition", idx, side, updated[idx][side]);
   };
 
-  // Xác định danh sách gợi ý dựa trên level
   const getTargetSuggestions = () => {
     if (currentLevel === 'pocket') {
-      return POCKET_ALIAS_SUGGESTIONS;   // chỉ hiện alias của ví hệ thống
+      return POCKET_ALIAS_SUGGESTIONS;
     }
-    // productLevel -> các biến TRANSBODY
     return TARGET_SUGGESTIONS.filter(s => s.startsWith('SENDER') || s.startsWith('RECEIVER') || s.startsWith('BILLER'));
   };
 

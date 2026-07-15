@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaLock, FaLockOpen, FaMagnifyingGlass, FaFilter, FaXmark, FaEye } from "react-icons/fa6";
+import { toast } from "react-toastify";
 import useCustomerStore from "../../../stores/useCustomerStore";
 import PaginatorFilter from "../../../components/PaginatorFilter";
 
@@ -29,12 +30,16 @@ const AdminListUsers = () => {
 
   const handleConfirmLock = async (e) => {
     e.preventDefault();
-    if (!reasonInput.trim()) return alert("Vui lòng nhập lý do khóa tài khoản!");
+    if (!reasonInput.trim()) {
+      toast.warning("Vui lòng nhập lý do khóa tài khoản!");
+      return;
+    }
     const res = await lockCustomer(selectedCustId, reasonInput.trim());
     if (res.success) {
+      toast.success("Khóa tài khoản thành công!");
       setSelectedCustId(null);
     } else {
-      alert(`Lỗi khóa tài khoản: ${res.message}`);
+      toast.error(`Lỗi khóa tài khoản: ${res.message}`);
     }
   };
 
@@ -42,8 +47,10 @@ const AdminListUsers = () => {
     const isConfirmed = window.confirm(`Bạn có chắc chắn muốn MỞ KHÓA lại cho tài khoản [ ${phone} ] và giải phóng ví tiền?`);
     if (isConfirmed) {
       const res = await unlockCustomer(id);
-      if (!res.success) {
-        alert(`Lỗi mở khóa tài khoản: ${res.message}`);
+      if (res.success) {
+        toast.success("Mở khóa tài khoản thành công!");
+      } else {
+        toast.error(`Lỗi mở khóa tài khoản: ${res.message}`);
       }
     }
   };

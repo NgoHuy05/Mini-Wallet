@@ -1,7 +1,6 @@
-/* eslint-disable no-useless-assignment */
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import useServiceStore from "../../../stores/useServiceStore";
 import ServiceForm from "./ServiceForm";
 
@@ -13,8 +12,15 @@ const defaultSchema = {
 };
 
 const defaultFormData = {
-  code: "", name: "", type: "billpayment", auth: "NONE", action: "none",
-  actionParams: "{}", feeType: "fixed", feeValue: 0, feeMax: 0,
+  code: "",
+  name: "",
+  type: "billpayment",
+  auth: "NONE",
+  action: "none",
+  actionParams: "{}",
+  feeType: "fixed",
+  feeValue: 0,
+  feeMax: 0,
 };
 
 const AdminServiceDetail = () => {
@@ -31,44 +37,47 @@ const AdminServiceDetail = () => {
   const [loadingDetail, setLoadingDetail] = useState(!isCreating && !!serviceId);
   const loadedIdRef = useRef(null);
 
-  const loadServiceDetail = useCallback(async (id) => {
-    setLoadingDetail(true);
-    try {
-      const result = await useServiceStore.getState().getFullServiceConfig(id);
-      if (result.success) {
-        const { service, fields, validations, definition } = result;
-        setFormData({
-          id: service.id,
-          code: service.code,
-          name: service.name,
-          type: service.type,
-          auth: service.auth,
-          action: service.action,
-          actionParams: JSON.stringify(service.actionParams || {}),
-          feeType: service.fee?.type || "fixed",
-          feeValue: service.fee?.value || 0,
-          feeMax: service.fee?.max || 0,
-        });
-        setTempSchema({
-          fields: fields || [],
-          validations: validations || [],
-          definition: definition?.glSteps || [],
-          inputBuilding: service.fieldBuilder || [],
-        });
-        setIsEditing(false);
-        setActiveTab("fields");
-        loadedIdRef.current = id;
-      } else {
-        alert("Không lấy được cấu hình: " + (result.message || "Lỗi"));
+  const loadServiceDetail = useCallback(
+    async (id) => {
+      setLoadingDetail(true);
+      try {
+        const result = await useServiceStore.getState().getFullServiceConfig(id);
+        if (result.success) {
+          const { service, fields, validations, definition } = result;
+          setFormData({
+            id: service.id,
+            code: service.code,
+            name: service.name,
+            type: service.type,
+            auth: service.auth,
+            action: service.action,
+            actionParams: JSON.stringify(service.actionParams || {}),
+            feeType: service.fee?.type || "fixed",
+            feeValue: service.fee?.value || 0,
+            feeMax: service.fee?.max || 0,
+          });
+          setTempSchema({
+            fields: fields || [],
+            validations: validations || [],
+            definition: definition?.glSteps || [],
+            inputBuilding: service.fieldBuilder || [],
+          });
+          setIsEditing(false);
+          setActiveTab("fields");
+          loadedIdRef.current = id;
+        } else {
+          toast.error("Không lấy được cấu hình: " + (result.message || "Lỗi không xác định"));
+          navigate("/admin/services");
+        }
+      } catch (err) {
+        toast.error("Lỗi kết nối khi tải dữ liệu: " + err.message);
         navigate("/admin/services");
+      } finally {
+        setLoadingDetail(false);
       }
-    } catch (err) {
-      alert("Lỗi kết nối: " + err.message);
-      navigate("/admin/services");
-    } finally {
-      setLoadingDetail(false);
-    }
-  }, [navigate]);
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     if (serviceId && serviceId !== "new" && loadedIdRef.current !== serviceId) {
@@ -78,7 +87,7 @@ const AdminServiceDetail = () => {
 
   const handleSaveService = async () => {
     if (!formData || !formData.code || !formData.name) {
-      alert("Vui lòng nhập Code và Tên Service!");
+      toast.warning("Vui lòng nhập Code và Tên Service!");
       return;
     }
 
@@ -86,7 +95,7 @@ const AdminServiceDetail = () => {
     try {
       actionParams = JSON.parse(formData.actionParams);
     } catch (e) {
-      alert("Action Params không đúng định dạng JSON");
+      toast.error("Action Params không đúng định dạng JSON");
       return;
     }
 
@@ -112,22 +121,22 @@ const AdminServiceDetail = () => {
       if (isCreating) {
         const result = await createFullServiceConfig(payload);
         if (result.success) {
-          alert("Tạo service thành công!");
+          toast.success("Tạo service thành công!");
           navigate("/admin/services");
         } else {
-          alert("Lỗi tạo service: " + (result.message || ""));
+          toast.error("Lỗi tạo service: " + (result.message || "Lỗi không xác định"));
         }
       } else {
         const result = await updateFullServiceConfig({ serviceId, ...payload });
         if (result.success) {
-          alert("Cập nhật service thành công!");
+          toast.success("Cập nhật service thành công!");
           navigate("/admin/services");
         } else {
-          alert("Lỗi cập nhật: " + (result.message || ""));
+          toast.error("Lỗi cập nhật: " + (result.message || "Lỗi không xác định"));
         }
       }
     } catch (err) {
-      alert("Lỗi kết nối: " + err.message);
+      toast.error("Lỗi kết nối khi lưu: " + err.message);
     }
   };
 

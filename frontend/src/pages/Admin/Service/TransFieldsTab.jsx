@@ -32,8 +32,8 @@ const TransFieldsTab = ({ fields, canEdit, onRowChange, onAddRow, onDeleteRow })
             onClick={() =>
               onAddRow("fields", {
                 fieldName: "",
-                inputType: "",
-                rules: {  },
+                inputType: "text",
+                rules: { minValue: 0, maxValue: 0, regex: "" },
                 needSecured: false,
                 isRequired: true,
                 errorCode: "",

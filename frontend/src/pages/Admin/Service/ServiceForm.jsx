@@ -51,7 +51,6 @@ const ServiceForm = ({
 
   return (
     <div className="space-y-4 p-4 bg-slate-50 min-h-screen">
-      {/* Header */}
       <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
         <div>
           <h1 className="text-xl font-bold text-slate-900">
@@ -112,14 +111,12 @@ const ServiceForm = ({
         </div>
       </div>
 
-      {/* Thông tin cơ bản */}
       <ServiceInfoForm
         formData={formData}
         onChange={onFormChange}
         disabled={!canEdit}
       />
 
-      {/* Tabs */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
         <div className="flex border-b border-gray-200">
           {tabs.map((tab) => (

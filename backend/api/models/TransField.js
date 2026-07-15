@@ -5,12 +5,12 @@ module.exports = {
     id: { type: 'string', columnName: '_id' },
     serviceId: { type: 'string', required: true },
     fieldName: { type: 'string', required: true },
-    label: { type: 'string', required: true },
+    label: { type: 'string' },
     description: { type: 'string' },
-    inputType: { type: 'string', required: true, isIn: ['text', 'number', 'phone', 'select'] },
+    inputType: { type: 'string', isIn: ['text', 'number', 'phone', 'select'] },
     isRequired: { type: 'boolean', defaultsTo: true },
     needSecured: { type: 'boolean', defaultsTo: false },
-    order: { type: 'number', required: true },
+    order: { type: 'number'},
     rules: { type: 'json' },
     errorCode: { type: 'string' }
   }
