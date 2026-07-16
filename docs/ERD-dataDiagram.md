@@ -1,5 +1,5 @@
 # ERD - sơ đồ quan hệ
-<img width="1692" height="1580" alt="Mini-Wallet (1)" src="https://github.com/user-attachments/assets/13c9ec48-1323-4d04-b90b-f0fd4b267eab" />
+<img width="1246" height="1180" alt="db-mini-wallet" src="https://github.com/user-attachments/assets/331a693d-2535-4f63-8a38-191a2b8e67e9" />
 
 
 # Database Models Overview
