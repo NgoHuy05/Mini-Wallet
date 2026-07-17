@@ -53,6 +53,7 @@ export const ERROR_CODE_MAP = {
   '4006': 'Quá dài',
   '4007': 'Định dạng không hợp lệ',
   '4008': 'Tùy chọn không hợp lệ',
+  '4009': 'Số tiền không hợp lệ',
   // Business validation (41xx)
   '4101': 'Người nhận không tồn tại',
   '4102': 'Không thể chuyển cho chính mình',
