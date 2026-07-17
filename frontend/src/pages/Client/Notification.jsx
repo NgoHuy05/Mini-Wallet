@@ -12,7 +12,7 @@ const NotificationPage = () => {
   useEffect(() => {
     fetchNotifications(1, 30);
     fetchUnreadCount();
-  }, []);
+  }, [fetchNotifications, fetchUnreadCount]);
 
   if (loading) return <div className="p-4">Đang tải...</div>;
 
